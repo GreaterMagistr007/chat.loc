@@ -10,6 +10,11 @@ class Chat extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'user_di1',
+        'user_di2',
+    ];
+
     /**
      * @param $userId
      * @return mixed
@@ -29,5 +34,16 @@ class Chat extends Model
     {
         $endTime = Carbon::now()->subMinutes(env('DELETE_CHAT_MINUTES'));
         self::where('updated_at', '<', $endTime)->delete();
+    }
+
+    public static function createNewChat($user1, $user2)
+    {
+        $item = new self([
+            'user_di1' => $user1->id,
+            'user_di2' => $user2->id,
+        ]);
+
+        $item->save();
+        return $item;
     }
 }
