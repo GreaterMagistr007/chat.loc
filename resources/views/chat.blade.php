@@ -13,17 +13,24 @@ $userId = \Illuminate\Support\Facades\Auth::user()->id;
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 @if (isset($message) && count($message))
                     @foreach($message as $m)
-                        <div class="p-6 text-gray-900 dark:text-gray-100" @if($m->from_id === $userId)  @endif>
+                        <x-message :message="$m" :is_receiver="$m->from_id === $userId">
                             текст сообщения 1
-                        </div>
+                        </x-message>
                     @endforeach
                 @else
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         в этом чате нет сообщений
                     </div>
                 @endif
-
             </div>
+        </div>
+    </div>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+
+
+
         </div>
     </div>
 
