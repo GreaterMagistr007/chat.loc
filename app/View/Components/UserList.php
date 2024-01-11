@@ -10,13 +10,22 @@ use Illuminate\View\Component;
 
 class UserList extends Component
 {
+    public $users;
+
     /**
      * Create a new component instance.
      */
     public function __construct()
     {
         $userId = Auth::user() ? Auth::user()->id : null;
-        $this->users = User::where('id', '<>', $userId)->get();
+        $users = User::where('id', '<>', $userId)->get();
+        $this->users = [];
+        foreach ($users as $user) {
+            $this->users[] = [
+                'key' => $user->id,
+                'value' => $user->name,
+            ];
+        }
     }
 
     /**
