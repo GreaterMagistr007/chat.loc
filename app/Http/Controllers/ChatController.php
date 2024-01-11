@@ -30,7 +30,7 @@ class ChatController extends Controller
 
     }
 
-    public function chat($id)
+    public function getChat($id)
     {
         return view('chat');
     }
