@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Chat extends Model
 {
@@ -45,5 +46,14 @@ class Chat extends Model
 
         $item->save();
         return $item;
+    }
+
+    public function getAnotherUser()
+    {
+        $user = Auth::user();
+
+        $anotherUserId = (int)$this->user_di1 === $user->id ? (int)$this->user_di2 : (int)$this->user_di1;
+
+        return User::where('id', $anotherUserId)->first();
     }
 }
