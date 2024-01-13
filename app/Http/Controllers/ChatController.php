@@ -80,14 +80,16 @@ class ChatController extends Controller
 
         $message = $chat->sendMessage($text);
 
-        foreach ($uploadedFiles as $file) {
-            $originalName = $file->getClientOriginalName();
-            $content = file_get_contents($file->getRealPath());
-            File::create([
-                'message_id' => $message->id,
-                'name' => $originalName,
-                'content' => $content,
-            ]);
+        foreach ($uploadedFiles as $files) {
+            foreach ($files as $file) {
+                $originalName = $file->getClientOriginalName();
+                $content = file_get_contents($file->getRealPath());
+                File::create([
+                    'message_id' => $message->id,
+                    'name' => $originalName,
+                    'content' => $content,
+                ]);
+            }
         }
 
         return self::success('');

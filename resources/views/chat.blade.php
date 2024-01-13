@@ -45,7 +45,7 @@
                         </button>
                     </div>
                     <div class="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
-                        <input type="file" multiple name="files"
+                        <input type="file" multiple name="files[]"
                                class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     </div>
                 </form>
@@ -70,7 +70,21 @@
                         }
 
                         getText() {
+                            let text = this.text && this.text !== null ? this.text : '';
 
+                            if (this.files && this.files.length) {
+                                for (let i in this.files) {
+                                    text += `
+                                    <br>
+                                    <a href="${this.files[i].download_href}" download="" style="display: inline-flex;">
+                                        <img src="/file_icon.png" alt="${this.files[i].name}" style="    max-width: 20px;">
+                                        ${this.files[i].name}
+                                    </a>
+                                    `;
+                                }
+                            }
+
+                            return text;
                         }
 
                         render () {
@@ -80,7 +94,7 @@
                             let template = `
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" >
                                 <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white ${this.is_receiver() ? 'text-right' : ''}">
-                                    ${this.text}
+                                    ${this.getText()}
                                 </td>
                             </tr>`;
 
@@ -216,7 +230,7 @@
                                     if (errorCallback) {
                                         errorCallback(error);
                                     } else {
-                                        window.location.reload();
+                                        // window.location.reload();
                                     }
                                     // Обработка ошибок, если необходимо
                                 });
