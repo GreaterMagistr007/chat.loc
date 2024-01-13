@@ -42,7 +42,18 @@ class Chat extends Model
     public static function deleteOld(): void
     {
         $endTime = Carbon::now()->subMinutes(env('DELETE_CHAT_MINUTES'))->timestamp;
-        self::where('updated_at', '<', $endTime)->delete();
+        $chats = self::where('updated_at', '<', $endTime)->get();
+
+        /** @var Chat $chat */
+        foreach ($chats as $chat) {
+            $chat->deleteAllMessages();
+            $chat->delete();
+        }
+    }
+
+    public function deleteAllMessages()
+    {
+        Message::deleteAllByChatId($this->id);
     }
 
     public static function createNewChat($user1, $user2)
@@ -75,6 +86,11 @@ class Chat extends Model
     public function getMessages()
     {
         return Message::getByChatId($this->id);
+    }
+
+    public function getNewMessages()
+    {
+        return Message::getNewMessagesByChatId($this->id);
     }
 
     public function getTimeToClose()

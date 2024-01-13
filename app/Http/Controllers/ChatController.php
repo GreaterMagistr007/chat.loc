@@ -71,9 +71,13 @@ class ChatController extends Controller
             return self::error('К этому чату нет доступа');
         }
 
-        $message = $chat->sendMessage($text);
-
         $uploadedFiles = $request->files;
+
+        if (!$text && !$uploadedFiles) {
+            return self::success('');
+        }
+
+        $message = $chat->sendMessage($text);
 
         foreach ($uploadedFiles as $file) {
             $originalName = $file->getClientOriginalName();
@@ -86,5 +90,16 @@ class ChatController extends Controller
         }
 
         return self::success('');
+    }
+
+    public function postGetNewMessages($id)
+    {
+        /** @var Chat $chat */
+        $chat = Chat::getChatForThisUserById($id);
+        if (!$chat) {
+            return self::error('К этому чату нет доступа');
+        }
+
+        return self::success('', ['messages' => $chat->getNewMessages()]);
     }
 }
