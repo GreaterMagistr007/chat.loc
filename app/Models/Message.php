@@ -34,7 +34,7 @@ class Message extends Model
     public static function getNewMessagesByChatId($chatId, $maxMessageId = 0)
     {
         $chatId = (int)$chatId;
-        $result = self::where('chat_id', $chatId)->where('is_delivered', false)->where('id', '>', $maxMessageId)->orderBy('id')->get();
+        $result = self::where('chat_id', $chatId)->where('id', '>', $maxMessageId)->orderBy('id')->get();
 
         foreach ($result as $item) {
             $item->setDelivered();
