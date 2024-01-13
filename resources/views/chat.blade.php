@@ -66,7 +66,11 @@
                         }
 
                         is_receiver() {
-                            return parseInt(this.this_user_id) === this.from_id;
+                            return parseInt(this.this_user_id) === parseInt(this.from_id);
+                        }
+
+                        getText() {
+
                         }
 
                         render () {
@@ -75,7 +79,7 @@
                             };
                             let template = `
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" >
-                                <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white ${this.is_receiver ? 'text-right' : ''}">
+                                <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white ${this.is_receiver() ? 'text-right' : ''}">
                                     ${this.text}
                                 </td>
                             </tr>`;
@@ -132,9 +136,17 @@
                             });
                         }
 
-                        renderAllMessages()
+                        getMaxMessageId()
                         {
+                            let result = 0;
+                            for (let i in this.messages) {
+                                let index = parseInt(i);
+                                if (index > result) {
+                                    result = index;
+                                }
+                            }
 
+                            return result;
                         }
 
                         getNewMessages()
@@ -142,7 +154,10 @@
                             let uri = `/chat/${this.id}/new`;
                             let self = this;
 
-                            this.postQuery(uri, null, function(data){
+                            let myFormData = new FormData();
+                            myFormData.append('maxMessageId', this.getMaxMessageId());
+
+                            this.postQuery(uri, myFormData, function(data){
                                 setTimeout(function () {
                                     self.getNewMessages()
                                 }, self.milisecondsTogetMessages);
@@ -193,6 +208,8 @@
                                     console.error('Ошибка:', error);
                                     if (errorCallback) {
                                         errorCallback(error);
+                                    } else {
+                                        window.location.reload();
                                     }
                                     // Обработка ошибок, если необходимо
                                 });

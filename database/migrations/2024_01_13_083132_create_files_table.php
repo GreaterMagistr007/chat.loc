@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
 
             $table->bigInteger('message_id')->nullable();
-            $table->string('name')->nullable();;
-            $table->binary('content')->nullable();;
+            $table->string('name')->nullable();
+            $table->binary('content')->nullable();
 
             $table->timestamps();
         });

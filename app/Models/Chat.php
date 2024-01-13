@@ -88,9 +88,9 @@ class Chat extends Model
         return Message::getByChatId($this->id);
     }
 
-    public function getNewMessages()
+    public function getNewMessages($maxMessageId = 0)
     {
-        return Message::getNewMessagesByChatId($this->id);
+        return Message::getNewMessagesByChatId($this->id, $maxMessageId);
     }
 
     public function getTimeToClose()
@@ -143,5 +143,11 @@ class Chat extends Model
 
         $message->save();
         return $message;
+    }
+
+    public function getMessageById($messageId)
+    {
+        $messageId = (int)$messageId;
+        return Message::where('id', $messageId)->where('chat_id', $this->id)->first();
     }
 }

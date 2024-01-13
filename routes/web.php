@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/{id}/all', [ChatController::class, 'postAllMessages'])->name('postAllMessages');
     Route::post('/chat/{id}/new', [ChatController::class, 'postGetNewMessages'])->name('postGetNewMessages');
     Route::post('/chat/{id}/message', [ChatController::class, 'postSendMessage'])->name('postSendMessage');
+    Route::get('/chat/{chatId}/{messageId}/{fileId}', [ChatController::class, 'downloadFile'])->name('downloadFile');
 });
 
 require __DIR__.'/auth.php';

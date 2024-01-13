@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Chat;
 use App\Models\File;
 use App\Models\Helper;
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -100,6 +101,40 @@ class ChatController extends Controller
             return self::error('К этому чату нет доступа');
         }
 
-        return self::success('', ['messages' => $chat->getNewMessages()]);
+        $maxMessageId = (int)request()->maxMessageId;
+
+        return self::success('', ['messages' => $chat->getNewMessages($maxMessageId)]);
+    }
+
+    public function downloadFile($chatId, $messageId, $fileId)
+    {
+        /** @var Chat $chat */
+        $chat = Chat::getChatForThisUserById($chatId);
+        if (!$chat) {
+            return self::error('К этому чату нет доступа');
+        }
+
+        /** @var Message $message */
+        $message = $chat->getMessageById($messageId);
+        if (!$message) {
+            return self::error('К этому сообщению нет доступа');
+        }
+
+        /** @var File $file */
+        $file = $message->getFileById($fileId);
+        if (!$file) {
+            return self::error('К этому файлу нет доступа');
+        }
+
+        return response()->stream(
+            function () use ($file) {
+                echo $file->content;
+            },
+            200,
+            [
+                'Content-Type' => 'application/octet-stream',
+                'Content-Disposition' => 'attachment; filename="' . $file->name . '"',
+            ]
+        );
     }
 }
