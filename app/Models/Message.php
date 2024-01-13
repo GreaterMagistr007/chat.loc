@@ -9,6 +9,14 @@ class Message extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'chat_id',
+        'from_id',
+        'id_to',
+        'text',
+        'is_delivered',
+    ];
+
     public static function getByChatId($chatId)
     {
         $chatId = (int)$chatId;

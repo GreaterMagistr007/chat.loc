@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chat;
+use App\Models\File;
+use App\Models\Helper;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,8 +60,31 @@ class ChatController extends Controller
         return self::success('', ['messages' => $chat->getMessages()]);
     }
 
-    public function sendMessage($id)
+    public function postSendMessage($id)
     {
-//        $text =
+        $request = request();
+        $text = $request->message_text;
+
+        /** @var Chat $chat */
+        $chat = Chat::getChatForThisUserById($id);
+        if (!$chat) {
+            return self::error('К этому чату нет доступа');
+        }
+
+        $message = $chat->sendMessage($text);
+
+        $uploadedFiles = $request->files;
+
+        foreach ($uploadedFiles as $file) {
+            $originalName = $file->getClientOriginalName();
+            $content = file_get_contents($file->getRealPath());
+            File::create([
+                'message_id' => $message->id,
+                'name' => $originalName,
+                'content' => $content,
+            ]);
+        }
+
+        return self::success('');
     }
 }

@@ -112,4 +112,20 @@ class Chat extends Model
 
         return $chat;
     }
+
+    public function sendMessage($text)
+    {
+        $from_id = Auth::user()->id;
+        $anotherUser = $this->getAnotherUser();
+        $id_to = $anotherUser ? $anotherUser->id : 0;
+        $message = new Message([
+            'chat_id' => $this->id,
+            'from_id' => $from_id,
+            'id_to' => $id_to,
+            'text' => $text,
+        ]);
+
+        $message->save();
+        return $message;
+    }
 }
