@@ -19,7 +19,6 @@ class Chat extends Model
     public static function getById($id)
     {
         $id = (int)$id;
-        self::deleteOld();
 
         return self::where('id', $id)->first();
     }
@@ -31,7 +30,6 @@ class Chat extends Model
     public static function getUserChats($userId)
     {
         $userId = (int)$userId;
-        self::deleteOld();
         return self::where('user_di1', $userId)->orWhere('user_di2', $userId)->get();
     }
 
@@ -41,14 +39,33 @@ class Chat extends Model
      */
     public static function deleteOld(): void
     {
-        $endTime = Carbon::now()->subMinutes(env('DELETE_CHAT_MINUTES'))->timestamp;
-        $chats = self::where('updated_at', '<', $endTime)->get();
+//        date_default_timezone_set('Europe/Moscow');
+//        $newTimestamp = time() - (env('DELETE_CHAT_MINUTES') * 60);
+//        $endTime = date('Y-m-d H:i:s', $newTimestamp);
+//
+////        $endTime = Carbon::now()->subMinutes(env('DELETE_CHAT_MINUTES'))->format('Y-m-d H:i:s');
+//        $chats = self::where('updated_at', '<', $endTime)->get();
+//
+//        /** @var Chat $chat */
+//        foreach ($chats as $chat) {
+////            $chat->fullDelete();
+//        }
+    }
 
-        /** @var Chat $chat */
-        foreach ($chats as $chat) {
-            $chat->deleteAllMessages();
-            $chat->delete();
+    public static function fullDeleteChat($chatId)
+    {
+        $chatId = (int)$chatId;
+        $chat = self::getById($chatId);
+
+        if ($chat) {
+            $chat->fullDelete();
         }
+    }
+
+    public function fullDelete()
+    {
+        $this->deleteAllMessages();
+        $this->delete();
     }
 
     public function deleteAllMessages()

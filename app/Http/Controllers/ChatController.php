@@ -139,4 +139,11 @@ class ChatController extends Controller
             ]
         );
     }
+
+    public function postDeleteChat($chatId)
+    {
+        Chat::fullDeleteChat($chatId);
+
+        return self::success('Чат совсем барахлом удален');
+    }
 }

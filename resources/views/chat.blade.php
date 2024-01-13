@@ -10,6 +10,10 @@
     </x-slot>
 
     <div class="flex flex-col max-h-screen" >
+        <x-button-href id="deleteChatButton" href="#" class="">Удалить чат</x-button-href>
+    </div>
+
+    <div class="flex flex-col max-h-screen" >
         <div class="flex-grow" style="padding-top: 3rem">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
@@ -91,6 +95,11 @@
                             if(this.is_renderer) {
                                 return;
                             };
+                            let text = this.getText();
+                            if (!text.length) {
+                                this.is_renderer = true;
+                                return;
+                            }
                             let template = `
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" >
                                 <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white ${this.is_receiver() ? 'text-right' : ''}">
@@ -129,11 +138,25 @@
                                 self.messageForm.reset();
                             });
 
-                            this.messageForm.addEventListener('keyup', function(e){
+                            this.messageForm.addEventListener('keydown', function(e){
                                 if (event.key === "Enter") {
                                     e.preventDefault()
                                     return self.sendMessage();
                                 }
+                            });
+
+                            this.messageForm.querySelector('[name="message_text"]').focus();
+
+                            document.querySelectorAll('#deleteChatButton').forEach(function(el){
+                                el.addEventListener('click', function(e){
+                                    let uri = `/chat/${self.id}/delete`;
+                                    if (confirm('Удалить этот чат?')) {
+                                        self.postQuery(uri, null, function(data){
+                                            window.location.reload();
+                                        });
+                                    }
+
+                                });
                             });
                         }
 
@@ -197,6 +220,7 @@
 
                             this.postQuery(uri, formData, function(data){
                                 self.messageForm.reset();
+                                this.messageForm.querySelector('[name="message_text"]').focus();
                             });
                         }
 
@@ -219,6 +243,11 @@
                                     return response.json(); // Возвращаем JSON из ответа, если необходимо
                                 })
                                 .then(data => {
+
+                                    if (data.error) {
+                                        window.location.reload();
+                                    }
+
                                     // console.log('Успешный ответ:', data);
                                     if (successCallback) {
                                         successCallback(data);
