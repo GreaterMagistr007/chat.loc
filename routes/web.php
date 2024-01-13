@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/create-chat', [ChatController::class, 'postCreateNewChat'])->name('post_createNewChat');
 
     Route::get('/chat/{id}', [ChatController::class, 'getChat'])->name('getChat');
+
+//    Route::post('/chat/{id}', [ChatController::class, 'getChat'])->name('getChat');
 });
 
 require __DIR__.'/auth.php';

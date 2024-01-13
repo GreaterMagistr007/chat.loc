@@ -56,4 +56,16 @@ class Chat extends Model
 
         return User::where('id', $anotherUserId)->first();
     }
+
+    public function isUserChat()
+    {
+        $user = Auth::user();
+
+        return (int)$this->user_di1 === $user->id ||  (int)$this->user_di2 === $user->id;
+    }
+
+    public function getMessages()
+    {
+        return Message::getByChatId($this->id);
+    }
 }

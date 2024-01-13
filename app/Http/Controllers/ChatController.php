@@ -32,6 +32,23 @@ class ChatController extends Controller
 
     public function getChat($id)
     {
-        return view('chat');
+        /** @var Chat $chat */
+        $chat = Chat::where('id', $id)->first();
+        if (!$chat || !$chat->isUserChat()) {
+            return view('chat_not_available');
+        }
+
+        $params = [
+            'user' => Auth::user(),
+            'chat' => $chat,
+            'messages' => $chat->getMessages()
+        ];
+
+        return view('chat', $params);
+    }
+
+    public function sendMessage($id)
+    {
+//        $text =
     }
 }
