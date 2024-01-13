@@ -33,7 +33,7 @@ class ChatController extends Controller
     public function getChat($id)
     {
         /** @var Chat $chat */
-        $chat = Chat::where('id', $id)->first();
+        $chat = Chat::getById($id);
         if (!$chat || !$chat->isUserChat()) {
             return view('chat_not_available');
         }

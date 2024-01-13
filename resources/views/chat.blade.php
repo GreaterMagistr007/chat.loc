@@ -1,7 +1,11 @@
 <x-app-layout>
+    <?php
+        $timeToClose = $chat->getTimeToClose();
+        ?>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Чат с пользователем {!! $chat->getAnotherUser()->name !!}
+            Чат с пользователем {!! $chat->getAnotherUser()->name !!}<br>
+            <small id="timeToClose" style="font-size: 60%;"></small>
         </h2>
     </x-slot>
 
@@ -49,6 +53,62 @@
 
         </div>
     </div>
+
+    <script>
+        let secondsToClose = {!! $timeToClose['fullSeconds'] !!};
+
+        function getTimeToClose()
+        {
+            let hours = 0;
+            let minutes = parseInt(secondsToClose / 60);
+            while(minutes > 60) {
+                minutes = minutes - 60;
+                hours += 1;
+            }
+            let seconds = secondsToClose - (hours * 60 * 60) - (minutes * 60);
+
+            return {
+                'hours': hours,
+                'minutes': minutes,
+                'seconds': seconds,
+            };
+        }
+
+        function toDoubleChars(int)
+        {
+            int = parseInt(int);
+            if (int === 0) {
+                return '00';
+            }
+
+            if (int > 9) {
+                return int;
+            }
+
+            return '0' + int;
+        }
+
+        function renderTimeToClose()
+        {
+            let timeToClose = getTimeToClose();
+
+            let text = toDoubleChars(timeToClose.hours) + ':' +
+                toDoubleChars(timeToClose.minutes) + ':' +
+                toDoubleChars(timeToClose.seconds)
+            ;
+
+            document.getElementById('timeToClose').innerHTML = 'Закроется через ' + text;
+        }
+
+        let timerId = setInterval(function () {
+            renderTimeToClose();
+            secondsToClose = secondsToClose - 1;
+
+            if (secondsToClose < 1) {
+                window.location.reload();
+            }
+        }, 1000);
+    </script>
 
 </x-app-layout>
 

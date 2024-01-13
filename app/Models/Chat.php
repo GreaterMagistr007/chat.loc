@@ -16,6 +16,14 @@ class Chat extends Model
         'user_di2',
     ];
 
+    public static function getById($id)
+    {
+        $id = (int)$id;
+        self::deleteOld();
+
+        return self::where('id', $id)->first();
+    }
+
     /**
      * @param $userId
      * @return mixed
@@ -33,7 +41,7 @@ class Chat extends Model
      */
     public static function deleteOld(): void
     {
-        $endTime = Carbon::now()->subMinutes(env('DELETE_CHAT_MINUTES'));
+        $endTime = Carbon::now()->subMinutes(env('DELETE_CHAT_MINUTES'))->timestamp;
         self::where('updated_at', '<', $endTime)->delete();
     }
 
@@ -67,5 +75,31 @@ class Chat extends Model
     public function getMessages()
     {
         return Message::getByChatId($this->id);
+    }
+
+    public function getTimeToClose()
+    {
+        $endTime = $this->updated_at->addMinutes(env('DELETE_CHAT_MINUTES'));
+        $now = Carbon::now();
+
+        $fullSecondsToClose = $now->diffInSeconds($endTime);
+
+        $hours = 0;
+        $minutes = intval($fullSecondsToClose / 60);
+        while ($minutes > 60) {
+            $minutes = $minutes - 60;
+            $hours += 1;
+        }
+        $seconds = $fullSecondsToClose - ($hours * 60 * 60) - ($minutes * 60);
+
+
+        $result = [
+            'hours' => $hours,
+            'minutes' => $minutes,
+            'seconds' => $seconds,
+            'fullSeconds' => $fullSecondsToClose
+        ];
+
+        return $result;
     }
 }
