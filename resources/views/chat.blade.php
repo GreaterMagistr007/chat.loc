@@ -1,4 +1,9 @@
 <x-app-layout>
+    <!-- Подключение CryptoJS -->
+    <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
+    <!-- Новая ссылка на GitHub -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+
     <?php
         $timeToClose = $chat->getTimeToClose();
         ?>
@@ -10,7 +15,20 @@
     </x-slot>
 
     <div class="flex flex-col max-h-screen" >
-        <x-button-href id="deleteChatButton" href="#" class="">Удалить чат</x-button-href>
+        <div class="flex-grow" style="padding-top: 3rem">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <x-button-href id="deleteChatButton" href="#" class="">Удалить чат</x-button-href>
+
+                <div>
+                    <x-input-label for="pass_key" :value="__('Ключ шифрования')" />
+                    <x-text-input id="pass_key" name="pass_key" type="text" class="mt-1 block w-full" :value="__('Ключ шифрования')" required />
+
+                    <script>
+                        let sharedKey = document.querySelector('#pass_key').value;
+                    </script>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="flex flex-col max-h-screen" >
@@ -59,6 +77,7 @@
                     class Message {
                         is_renderer = false;
                         this_user_id = {!! $user->id !!};
+                        block;
 
                         constructor(obj = {}, parentElement) {
                             for (let i in obj) {
@@ -76,6 +95,16 @@
                         getText() {
                             let text = this.text && this.text !== null ? this.text : '';
 
+                            // console.log('this.text: ' + this.text);
+
+                            if (this.is_receiver()) {
+                                text = CryptoJS.AES.decrypt(text, sharedKey).toString(CryptoJS.enc.Utf8);
+                            } else {
+                                text = CryptoJS.AES.encrypt(text, sharedKey).toString();
+                            }
+
+                            // console.log('text: ' + text);
+
                             if (this.files && this.files.length) {
                                 for (let i in this.files) {
                                     text += `
@@ -92,22 +121,56 @@
                         }
 
                         render () {
-                            if(this.is_renderer) {
-                                return;
-                            };
+
+                            // if(this.is_renderer) {
+                            //     return;
+                            // };
                             let text = this.getText();
+
+                            // console.log('Рендерим сообщение: ' + text);
+                            // console.log('sharedKey:' + sharedKey);
+
+
+                            console.log(this.block);
+
                             if (!text.length) {
+                                if (this.block) {
+                                    this.block.style.display = 'none';
+                                }
                                 this.is_renderer = true;
                                 return;
                             }
+
+                            if (this.block) {
+                                this.block.style.display = 'table-row';
+                            }
+
+
+
+
+                            // let template = `
+                            // <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" >
+                            //     <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white ${this.is_receiver() ? 'text-right' : ''}">
+                            //         ${this.getText()}
+                            //     </td>
+                            // </tr>`;
+                            // this.parentElement.innerHTML += template;
+
                             let template = `
-                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" >
                                 <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white ${this.is_receiver() ? 'text-right' : ''}">
                                     ${this.getText()}
                                 </td>
-                            </tr>`;
+                            `;
 
-                            this.parentElement.innerHTML += template ;
+                            if (!this.block) {
+                                this.block = document.createElement('tr');
+                                this.block.classList.add("bg-white", "border-b", "dark:bg-gray-800", "dark:border-gray-700");
+
+                                this.parentElement.appendChild(this.block);
+                            }
+
+                            this.block.innerHTML = template;
+
                             scrolling_element.scrollTop = scrolling_element.scrollHeight;
 
                             this.is_renderer = true;
@@ -158,6 +221,19 @@
 
                                 });
                             });
+
+                            document.querySelector('#pass_key').addEventListener('keyup', function(e){
+                                sharedKey = e.target.value;
+                                console.log('Ключ теперь: ' + sharedKey);
+                                self.renderAllMessages();
+                            });
+                        }
+
+                        renderAllMessages()
+                        {
+                            for (let i in this.messages) {
+                                this.messages[i].render();
+                            }
                         }
 
                         addMessageToStorage(message = {})
@@ -216,11 +292,15 @@
                         {
                             let self = this;
                             let formData = new FormData(this.messageForm);
+                            let text = formData.get('message_text');
+                            let newText = CryptoJS.AES.encrypt(text, sharedKey).toString();
+                            // console.log('newText: ' + newText);
+                            formData.set('message_text', newText);
                             let uri = `/chat/${this.id}/message`;
 
                             this.postQuery(uri, formData, function(data){
                                 self.messageForm.reset();
-                                this.messageForm.querySelector('[name="message_text"]').focus();
+                                self.messageForm.querySelector('[name="message_text"]').focus();
                             });
                         }
 
