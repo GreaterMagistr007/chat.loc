@@ -114,6 +114,13 @@
                                 self.sendMessage();
                                 self.messageForm.reset();
                             });
+
+                            this.messageForm.addEventListener('keyup', function(e){
+                                if (event.key === "Enter") {
+                                    e.preventDefault()
+                                    return self.sendMessage();
+                                }
+                            });
                         }
 
                         addMessageToStorage(message = {})
