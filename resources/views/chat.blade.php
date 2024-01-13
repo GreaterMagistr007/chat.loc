@@ -97,11 +97,7 @@
 
                             // console.log('this.text: ' + this.text);
 
-                            if (this.is_receiver()) {
-                                text = CryptoJS.AES.decrypt(text, sharedKey).toString(CryptoJS.enc.Utf8);
-                            } else {
-                                text = CryptoJS.AES.encrypt(text, sharedKey).toString();
-                            }
+                            text = CryptoJS.AES.decrypt(text, sharedKey).toString(CryptoJS.enc.Utf8);
 
                             // console.log('text: ' + text);
 
@@ -131,7 +127,7 @@
                             // console.log('sharedKey:' + sharedKey);
 
 
-                            console.log(this.block);
+                            // console.log(this.block);
 
                             if (!text.length) {
                                 if (this.block) {
@@ -224,7 +220,7 @@
 
                             document.querySelector('#pass_key').addEventListener('keyup', function(e){
                                 sharedKey = e.target.value;
-                                console.log('Ключ теперь: ' + sharedKey);
+                                // console.log('Ключ теперь: ' + sharedKey);
                                 self.renderAllMessages();
                             });
                         }
