@@ -33,8 +33,8 @@ class ChatController extends Controller
     public function getChat($id)
     {
         /** @var Chat $chat */
-        $chat = Chat::getById($id);
-        if (!$chat || !$chat->isUserChat()) {
+        $chat = Chat::getChatForThisUserById($id);
+        if (!$chat) {
             return view('chat_not_available');
         }
 
@@ -45,6 +45,17 @@ class ChatController extends Controller
         ];
 
         return view('chat', $params);
+    }
+
+    public function postAllMessages($id)
+    {
+        /** @var Chat $chat */
+        $chat = Chat::getChatForThisUserById($id);
+        if (!$chat) {
+            return self::error('К этому чату нет доступа');
+        }
+
+        return self::success('', ['messages' => $chat->getMessages()]);
     }
 
     public function sendMessage($id)

@@ -102,4 +102,14 @@ class Chat extends Model
 
         return $result;
     }
+
+    public static function getChatForThisUserById($chatId)
+    {
+        $chat = self::getById($chatId);
+        if (!$chat || !$chat->isUserChat()) {
+            return null;
+        }
+
+        return $chat;
+    }
 }

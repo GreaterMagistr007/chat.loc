@@ -49,6 +49,65 @@
                 </div>
             </form>
 
+            <script>
+                class Message {
+
+                }
+
+                class Chat {
+                    messages = {};
+                    id;
+                    constructor()
+                    {
+                        this.id = {!! $chat->id !!};
+                    }
+
+                    getMessages()
+                    {
+                        let uri = `/chat/${this.id}/all`;
+                        this.postQuery(uri, {}, function(data){
+                            console.log('data:', data);
+                        });
+                    }
+
+                    postQuery(uri = '', params = {}, successCallback = null, errorCallback = null)
+                    {
+                        const options = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json', // Устанавливаем заголовок для JSON-данных
+                                'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                            },
+                            body: JSON.stringify(params), // Преобразуем данные в формат JSON
+                        };
+
+                        fetch(uri, options)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`Ошибка сети: ${response.status}`);
+                                }
+                                return response.json(); // Возвращаем JSON из ответа, если необходимо
+                            })
+                            .then(data => {
+                                console.log('Успешный ответ:', data);
+                                if (successCallback) {
+                                    successCallback(data);
+                                }
+                                // Дополнительные действия с данными, если необходимо
+                            })
+                            .catch(error => {
+                                console.error('Ошибка:', error);
+                                if (errorCallback) {
+                                    errorCallback(error);
+                                }
+                                // Обработка ошибок, если необходимо
+                            });
+                    }
+                }
+
+                let chat = new Chat();
+            </script>
+
 
 
         </div>

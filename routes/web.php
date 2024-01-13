@@ -33,7 +33,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/chat/{id}', [ChatController::class, 'getChat'])->name('getChat');
 
-//    Route::post('/chat/{id}', [ChatController::class, 'getChat'])->name('getChat');
+    Route::post('/chat/{id}/all', [ChatController::class, 'postAllMessages'])->name('postAllMessages');
 });
 
 require __DIR__.'/auth.php';
